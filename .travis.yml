@@ -8,8 +8,8 @@ services:
 env:
 
   matrix:
-    - TESTS="1"
-    - LINT_CHECK="1"
+    - DOCKERFILE="9.0-Dockerfile" TESTS="1"
+    - DOCKERFILE="10.0-Dockerfile" TESTS="1"
 
 install:
   - git clone --depth=1 https://github.com/LasLabs/docker-quality-tools.git ${HOME}/docker-quality-tools

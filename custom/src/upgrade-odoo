@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -e
+
+log INFO "Upgrading database clone"
+odoo -d "${DB_TARGET}" --workers 0 --stop-after-init --update "${ODOO_UPDATE:=all}"
