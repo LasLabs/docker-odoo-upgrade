@@ -6,6 +6,8 @@ log INFO "Setting up the Postgres credentials"
 
 PGUSER_OLD=${PGUSER_OLD:=${PGUSER}}
 PGPASSWORD_OLD=${PGPASSWORD_OLD:=${PGPASSWORD}}
+ODOO_FILESTORE_NEW=${ODOO_FILESTORE_NEW:=/var/lib/odoo}
+ODOO_FILESTORE_OLD=${ODOO_FILESTORE_OLD:=/var/lib/odoo_old}
 
 cat <<EOF > ~/.pgpass
 db:5432:${DB_TARGET}:${PGUSER}:${PGPASSWORD}
@@ -15,12 +17,18 @@ EOF
 chmod 0600 ~/.pgpass
 
 log INFO "Rsyncing the old file store to the new file store"
-# mkdir -p /var/lib/odoo/filestore/${DB_TARGET}/
-# rsync -avz /var/lib/odoo_old/filestore/${DB_SOURCE}/ /var/lib/odoo/filestore/${DB_TARGET}/
+mkdir -p "${ODOO_FILESTORE_NEW}/filestore/${DB_TARGET}/"
+rsync -avz \
+    "${ODOO_FILESTORE_OLD}/filestore/${DB_SOURCE}/" \
+    "${ODOO_FILESTORE_NEW}/filestore/${DB_TARGET}"
 
 log INFO "Creating a clone of the database for upgrade"
-# echo "CREATE DATABASE ${DB_TARGET};" | psql -h db
-# pg_dump -h db_old -Fc "${DB_SOURCE}" | pg_restore -h db -d "${DB_TARGET}"
+echo "CREATE DATABASE ${DB_TARGET};" | psql -h db
+pg_dump -h db_old -Fc "${DB_SOURCE}" | pg_restore -h db -d "${DB_TARGET}"
 
-# log INFO "Upgrading database clone"
-# odoo -d "${DB_TARGET}" --workers 0 --stop-after-init --update "${ODOO_UPDATE:=all}"
+log INFO "Upgrading database clone"
+odoo -d "${DB_TARGET}" \
+    --workers 0 \
+    --stop-after-init  \
+    --data-dir "${ODOO_FILESTORE_NEW}"
+    --update "${ODOO_UPDATE:=all}"

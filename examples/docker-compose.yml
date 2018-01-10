@@ -44,7 +44,12 @@ services:
 
   custom_upgrader:
     image: your_organization/your_odoo_scaffold_image:9.0
-    command: "autoupdate"
+    command: |
+      odoo --workers 0 \
+           --limit-time-cpu 0 \
+           --limit-time-real 0 \
+           --stop-after-init \
+           --update all
     volumes:
       - ~/odoo_v9_data:/var/lib/odoo
     environment:

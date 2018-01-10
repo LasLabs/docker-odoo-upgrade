@@ -1,8 +1,8 @@
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Build Status](https://travis-ci.org/LasLabs/docker-odoo-upgrade.svg?branch=master)](https://travis-ci.org/LasLabs/docker-odoo-upgrade)
 
-[![](https://images.microbadger.com/badges/image/laslabs/docker-odoo-upgrade.svg)](https://microbadger.com/images/laslabs/docker-odoo-upgrade "Get your own image badge on microbadger.com")
-[![](https://images.microbadger.com/badges/version/laslabs/docker-odoo-upgrade.svg)](https://microbadger.com/images/laslabs/docker-odoo-upgrade "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/laslabs/odoo-upgrade.svg)](https://microbadger.com/images/laslabs/odoo-upgrade "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/laslabs/odoo-upgrade.svg)](https://microbadger.com/images/laslabs/odoo-upgrade "Get your own version badge on microbadger.com")
 
 Docker Odoo Upgrade
 ===================
@@ -13,11 +13,11 @@ production environments.
 
 This repository is tagged by the Odoo version that is being targeted, and
 you can only upgrade one version at a time. Each tag is represented by a
-Dockerfile, prefixed with the tag name.F or example, to upgrade version
+Dockerfile, prefixed with the tag name. For example, to upgrade version
 8 to version 10, you need to use the:
 
 * [9.0 image](./9.0-Dockerfile) first
-* [10.0 imaqe](./10.0-Dockerfile) next
+* [10.0 image](./10.0-Dockerfile) next
 
 In order to use this image, you must meet the following condition(s):
 
@@ -147,7 +147,12 @@ services:
 
   custom_upgrader:
     image: your_organization/your_odoo_scaffold_image:9.0
-    command: "autoupdate"
+    command: |
+      odoo --workers 0 \
+           --limit-time-cpu 0 \
+           --limit-time-real 0 \
+           --stop-after-init \
+           --update all
     volumes:
       - ~/odoo_v9_data:/var/lib/odoo
     environment:
@@ -208,11 +213,13 @@ PGPASSWORD_OLD:=PGPASSWORD
 DB_SOURCE
 DB_TARGET
 ODOO_UPDATE:=all
+ODOO_FILESTORE_NEW=:/var/lib/odoo
+ODOO_FILESTORE_OLD=:/var/lib/odoo_old
 
 Known Issues / Roadmap
 ======================
 
-*
+* Document the environment variables
 
 Bug Tracker
 ===========
