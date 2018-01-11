@@ -215,6 +215,8 @@ DB_TARGET
 ODOO_UPDATE:=all
 ODOO_FILESTORE_NEW=:/var/lib/odoo
 ODOO_FILESTORE_OLD=:/var/lib/odoo_old
+ODOO_URI_OLD
+ADMIN_PASSWORD_OLD=:ADMIN_PASSWORD
 
 Known Issues / Roadmap
 ======================
