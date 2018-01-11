@@ -177,6 +177,31 @@ services:
 After running the above, you will be left with a running Odoo v9 instance
 that was upgraded from your Odoo v8 instance.
 
+Existing Instance Isn't Dockerized
+==================================
+
+If your existing Odoo instance is not Dockerized, but you would like to
+improve your architecture at the same time you upgrade major versions,
+this section is for you.
+
+The process from a high level:
+
+* [Setup your scaffold]
+
+
+Not Dockerized?
+===============
+
+If your Odoo instance is not Dockerized, and you have no plans of doing so,
+you can still use this strategy! You will still need to install Docker
+somewhere, but that can easily be on whatever system you use to develop on.
+
+The process from a high level:
+
+*
+
+
+
 Configuration
 =============
 

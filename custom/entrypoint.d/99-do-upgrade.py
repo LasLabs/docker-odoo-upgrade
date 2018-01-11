@@ -49,6 +49,7 @@ if os.environ.get('ODOO_URI_OLD'):
     admin_pass = os.environ.get(
         'ADMIN_PASSWORD_OLD', os.environ['ADMIN_PASSWORD'],
     )
+    odoo_uri = os.environ['ODOO_URI_OLD'].strip('/')
 
     logging.info('Getting the backup from the external Odoo.')
     response = requests.post(
