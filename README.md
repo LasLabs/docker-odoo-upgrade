@@ -1,8 +1,14 @@
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Build Status](https://travis-ci.org/LasLabs/docker-odoo-upgrade.svg?branch=master)](https://travis-ci.org/LasLabs/docker-odoo-upgrade)
 
-[![](https://images.microbadger.com/badges/image/laslabs/odoo-upgrade.svg)](https://microbadger.com/images/laslabs/odoo-upgrade "Get your own image badge on microbadger.com")
-[![](https://images.microbadger.com/badges/version/laslabs/odoo-upgrade.svg)](https://microbadger.com/images/laslabs/odoo-upgrade "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/laslabs/odoo-upgrade:9.0.svg)](https://microbadger.com/images/laslabs/odoo-upgrade:9.0 "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/laslabs/odoo-upgrade:9.0.svg)](https://microbadger.com/images/laslabs/odoo-upgrade:9.0 "Get your own version badge on microbadger.com")
+
+[![](https://images.microbadger.com/badges/image/laslabs/odoo-upgrade:10.0.svg)](https://microbadger.com/images/laslabs/odoo-upgrade:10.0 "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/laslabs/odoo-upgrade:10.0.svg)](https://microbadger.com/images/laslabs/odoo-upgrade:10.0 "Get your own version badge on microbadger.com")
+
+[![](https://images.microbadger.com/badges/image/laslabs/odoo-upgrade:11.0.svg)](https://microbadger.com/images/laslabs/odoo-upgrade:11.0 "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/laslabs/odoo-upgrade:11.0.svg)](https://microbadger.com/images/laslabs/odoo-upgrade:11.0 "Get your own version badge on microbadger.com")
 
 Docker Odoo Upgrade
 ===================
@@ -18,11 +24,6 @@ Dockerfile, prefixed with the tag name. For example, to upgrade version
 
 * [9.0 image](./9.0-Dockerfile) first
 * [10.0 image](./10.0-Dockerfile) next
-
-In order to use this image, you must meet the following condition(s):
-
-* Have an existing Dockerized Odoo instance on the version prior to the target version,
-  or the knowledge to make the necessary adjustments to the tutorial.
 
 Basic Instructions
 ==================
@@ -85,6 +86,9 @@ docker run \
     -e "DB_SOURCE=odoo_v9" \
     -e "DB_TARGET=odoo_v10" \
     laslabs/odoo-upgrade:10.0
+
+# Whatever command to start your v10 environment goes below.
+odoo
 ```
 
 Running the above, you will be left with an Odoo v9 and an Odoo v10 database &
@@ -177,30 +181,53 @@ services:
 After running the above, you will be left with a running Odoo v9 instance
 that was upgraded from your Odoo v8 instance.
 
-Existing Instance Isn't Dockerized
-==================================
+Using a Live Instance
+=====================
 
-If your existing Odoo instance is not Dockerized, but you would like to
-improve your architecture at the same time you upgrade major versions,
-this section is for you.
+This image provides the ability to obtain an Odoo backup on the fly, instead
+of having to mount the old volume and database. To enable this functionality,
+you should set the following environment variables on the upgrader instance:
 
-The process from a high level:
+* `ODOO_URI_OLD`: The base URI of the old Odoo instance, including `http(s)://`
+* `ADMIN_PASSWORD_OLD`: The database administration password for the old Odoo
+  instance.
 
-* [Setup your scaffold]
+The Odoo instance that you provide must have the capability of delivering a
+database backup through its web interface. This is usually not possible in
+production due to time limits, but that is easy enough to work around and out
+of scope here.
 
+Assuming the following:
 
-Not Dockerized?
-===============
+* You have a PostgreSQL container named `postgresql` running
+* You want your new file store to be located at `~/odoo_v10_test` on your host
+* The old Odoo is located at `https://odoo.example.com`
+* The old Odoo database is named `odoo_v9`
+* You want to name the new Odoo database `odoo_v10`
+* Your PostgreSQL user and password are both `odoo`
 
-If your Odoo instance is not Dockerized, and you have no plans of doing so,
-you can still use this strategy! You will still need to install Docker
-somewhere, but that can easily be on whatever system you use to develop on.
+Then a docker run command to upgrade a v9 to v10 would look something like this:
 
-The process from a high level:
+```bash
+docker run \
+       -e "DB_SOURCE=odoo_v9" \
+       -e "DB_TARGET=odoo_v10" \
+       -e "PGDATABASE=odoo_v10" \
+       -e "PGUSER=odoo" \
+       -e "PGPASSWORD=odoo" \
+       -e "ODOO_URI_OLD=https://odoo.example.com" \
+       -e "ADMIN_PASSWORD_OLD=test" \
+       --link postgresql:db \
+       -v ~/odoo_v10_test:/var/lib/odoo \
+       laslabs/odoo-upgrade:10.0
+```
 
-*
+You would subsequently launch your v10 environment as normal, making sure
+to configure the `data_dir` and `db_host` parameters appropriately.
 
-
+Upon first launch, your custom modules will be upgraded. This is because the
+upgrade image is only scoped to Odoo core modules, but makes sure to flag the
+remainder of the modules for upgrade as well.
 
 Configuration
 =============
@@ -230,23 +257,21 @@ pleasure:
 
 | Name | Default | Description |
 |------|---------|-------------|
-
-PGUSER
-PGPASSWORD
-PGUSER_OLD:=PGUSER
-PGPASSWORD_OLD:=PGPASSWORD
-DB_SOURCE
-DB_TARGET
-ODOO_UPDATE:=all
-ODOO_FILESTORE_NEW=:/var/lib/odoo
-ODOO_FILESTORE_OLD=:/var/lib/odoo_old
-ODOO_URI_OLD
-ADMIN_PASSWORD_OLD=:ADMIN_PASSWORD
+| `DB_SOURCE` | odoo | The name of the source database |
+| `DB_TARGET` | odoo | The name of the target database |
+| `ODOO_FILESTORE_NEW` | /var/lib/odoo | The path you mounted the new Odoo file store on. |
+| `ODOO_FILESTORE_OLD` | /var/lib/odoo_old | The path you mounted the old Odoo file store on. |
+| `ODOO_URI_OLD` |  | Define this to obtain a backup from a live instance. Include the URI scheme. |
+| `ADMIN_PASSWORD_OLD` |  | If using an external backup, this is the database administration password. |
+| `ODOO_UPDATE` | all | The modules to flag for updating |
+| `PGUSER` | odoo | The PostgreSQL user to use for the new Odoo |
+| `PGUSER_OLD` | $PGUSER | The PostgreSQL user to use for the old Odoo |
+| `PGPASSWORD` |  | The PostgreSQL password to use for the new Odoo |
+| `PGPASSWORD_OLD` | $PGPASSWORD | The PostgreSQL password to use for the old Odoo |
 
 Known Issues / Roadmap
 ======================
 
-* Document the environment variables
 
 Bug Tracker
 ===========

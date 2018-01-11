@@ -8,10 +8,10 @@ import subprocess
 from io import BytesIO
 from zipfile import ZipFile
 
-DB_SOURCE = os.environ['DB_SOURCE']
-DB_TARGET = os.environ['DB_TARGET']
+DB_SOURCE = os.environ.get('DB_SOURCE', 'odoo')
+DB_TARGET = os.environ.get('DB_TARGET', 'odoo')
 
-PGUSER = os.environ.get('PGUSER')
+PGUSER = os.environ.get('PGUSER', 'odoo')
 PGPASSWORD = os.environ.get('PGPASSWORD')
 PGUSER_OLD = os.environ.get('PGUSER_OLD', PGUSER)
 PGPASSWORD_OLD = os.environ.get('PGPASSWORD_OLD', PGPASSWORD)
@@ -20,7 +20,7 @@ ODOO_FILESTORE_NEW = os.environ.get('ODOO_FILESTORE_NEW', '/var/lib/odoo')
 ODOO_FILESTORE_OLD = os.environ.get('ODOO_FILESTORE_OLD', '/var/lib/odoo_old')
 ODOO_UPDATE = os.environ.get('ODOO_UPDATE', 'all')
 
-logging.info('Create empty directories for the filestores if non-existent.')
+logging.info('Create empty directories for the file stores if non-existent.')
 logging.debug(
     subprocess.check_output([
         'mkdir', '-p',
@@ -54,7 +54,7 @@ if os.environ.get('ODOO_URI_OLD') or os.environ.get('ODOO_BACKUP_PATH'):
         logging.info('Getting the backup from the external Odoo.')
         odoo_uri = os.environ['ODOO_URI_OLD'].strip('/')
         response = requests.post(
-            '%s/web/database/backup' % os.environ['ODOO_URI_OLD'],
+            '%s/web/database/backup' % odoo_uri,
             {
                 'master_pwd': admin_pass,
                 'name': os.environ['DB_SOURCE'],

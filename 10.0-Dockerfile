@@ -1,11 +1,8 @@
 FROM tecnativa/odoo-base:10.0
 
 ARG ODOO_VERSION=10.0
-
-ARG CONFIG_BUILD=true
-
-ENV ODOO_VERSION="$ODOO_VERSION" \
-    CONFIG_BUILD="$CONFIG_BUILD"
+ENV ODOO_VERSION=$ODOO_VERSION \
+    PGDATABASE=$DB_TARGET
 
 CMD ["/opt/odoo/custom/src/upgrade-odoo"]
 
