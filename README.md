@@ -261,6 +261,8 @@ pleasure:
 | `DB_TARGET` | odoo | The name of the target database |
 | `ODOO_FILESTORE_NEW` | /var/lib/odoo | The path you mounted the new Odoo file store on. |
 | `ODOO_FILESTORE_OLD` | /var/lib/odoo_old | The path you mounted the old Odoo file store on. |
+| `ODOO_SYSTEM_USER` | odoo | This is the name (or uid) of the Odoo system user on the target image. This is used to ensure proper permissions on the file store. |
+| `ODOO_SYSTEM_GROUP` | odoo | This is the name (or gid) of the Odoo system group on the target image. This is used to ensure proper permissions on the file store. |
 | `ODOO_URI_OLD` |  | Define this to obtain a backup from a live instance. Include the URI scheme. |
 | `ADMIN_PASSWORD_OLD` |  | If using an external backup, this is the database administration password. |
 | `ODOO_UPDATE` | all | The modules to flag for updating |
