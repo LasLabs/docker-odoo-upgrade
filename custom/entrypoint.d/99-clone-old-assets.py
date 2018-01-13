@@ -19,6 +19,8 @@ PGPASSWORD_OLD = os.environ.get('PGPASSWORD_OLD', PGPASSWORD)
 ODOO_FILESTORE_NEW = os.environ.get('ODOO_FILESTORE_NEW', '/var/lib/odoo')
 ODOO_FILESTORE_OLD = os.environ.get('ODOO_FILESTORE_OLD', '/var/lib/odoo_old')
 ODOO_UPDATE = os.environ.get('ODOO_UPDATE', 'all')
+ODOO_SYSTEM_USER = os.environ.get('ODOO_SYSTEM_USER', 'odoo')
+ODOO_SYSTEM_GROUP = os.environ.get('ODOO_SYSTEM_GROUP', 'odoo')
 
 logging.info('Create empty directories for the file stores if non-existent.')
 logging.debug(
@@ -98,5 +100,12 @@ logging.debug(
         'rsync', '-avz',
         rsync_location,
         os.path.join(ODOO_FILESTORE_NEW, 'filestore', DB_TARGET),
+    ])
+)
+logging.debug(
+    subprocess.check_output([
+        'chown', '-R',
+        '%s:%s' % (ODOO_SYSTEM_USER, ODOO_SYSTEM_GROUP),
+        ODOO_FILESTORE_NEW,
     ])
 )
