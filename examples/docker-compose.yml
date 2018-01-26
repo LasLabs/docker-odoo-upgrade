@@ -1,0 +1,71 @@
+version: "2"
+
+services:
+
+  postgresql:
+    image: postgres:9.6-alpine
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD: odoo_password
+      POSTGRES_USER: odoo_user
+    volumes:
+    - ~/postgresql_data/:/var/lib/postgresql/data/
+
+  # This is your original Odoo v8 deploy.
+  # Use this as a reference for changes that need to be made in other sections
+  # in order to match your actual deploy. An environment file makes this easier,
+  # but was excluded in the interest of a one file example.
+  #
+  # odoo_v8:
+  #  image: your_organization/your_odoo_scaffold_image:8.0
+  #  environment:
+  #    - PGDATABASE: odoo_v8
+  #    - PGPASSWORD: odoo_password
+  #    - PGUSER: odoo_user
+  #  volumes:
+  #    - ~/odoo_v8_data:/var/lib/odoo
+  #  links:
+  #    - postgresql:db
+
+  openupgrade_v9:
+    image: laslabs/odoo-upgrade:9.0
+    volumes:
+      - ~/odoo_v8_data:/var/lib/odoo_old
+      - ~/odoo_v9_data:/var/lib/odoo
+    environment:
+      - DB_SOURCE: odoo_v8
+      - DB_TARGET: odoo_v9
+      - PGDATABASE: odoo_v9
+      - PGUSER: odoo_user
+      - PGPASSWORD: odoo_password
+    links:
+      - postgresql:db
+      - postgresql:db_old
+
+  custom_upgrader:
+    image: your_organization/your_odoo_scaffold_image:9.0
+    command: |
+      odoo --workers 0 \
+           --limit-time-cpu 0 \
+           --limit-time-real 0 \
+           --stop-after-init \
+           --update all
+    volumes:
+      - ~/odoo_v9_data:/var/lib/odoo
+    environment:
+      - PGDATABASE: odoo_v9
+      - PGUSER: odoo_user
+      - PGPASSWORD: odoo_password
+    links:
+      - postgresql:db
+
+  custom_upgrader:
+    image: your_organization/your_odoo_scaffold_image:9.0
+    volumes:
+      - ~/odoo_v9_data:/var/lib/odoo
+    environment:
+      - PGDATABASE: odoo_v9
+      - PGUSER: odoo_user
+      - PGPASSWORD: odoo_password
+    links:
+      - postgresql:db

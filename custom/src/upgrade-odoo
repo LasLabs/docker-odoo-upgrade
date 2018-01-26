@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+
+log INFO "Upgrading database clone"
+odoo -d "${DB_TARGET}" \
+     --workers 0 \
+     --stop-after-init \
+     --data-dir "${ODOO_FILESTORE_NEW:=/var/lib/odoo}" \
+     --update "${ODOO_UPDATE:=all}"

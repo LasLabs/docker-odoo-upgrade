@@ -1,0 +1,12 @@
+# Odoo is always required
+./odoo:
+  defaults:
+    # Shallow repositories (1=1) are faster & thinner
+    # You may need a bigger depth when merging PRs
+    depth: "$DEPTH_DEFAULT"
+  remotes:
+    openupgrade: https://github.com/OCA/OpenUpgrade.git
+  target:
+    openupgrade $ODOO_VERSION
+  merges:
+    - openupgrade $ODOO_VERSION
